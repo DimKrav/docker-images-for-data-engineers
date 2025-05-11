@@ -15,3 +15,5 @@ Clickhouse
 
 ### 4. [PostgreSQL](./postgres/README.md)
 Postgres SQL server 
+
+### 5. [PostgreSQL + pgAdmin4](./postgres-pgadmin/docker-compose.yaml)
