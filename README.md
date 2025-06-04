@@ -17,3 +17,6 @@ Clickhouse
 Postgres SQL server 
 
 ### 5. [PostgreSQL + pgAdmin4](./postgres-pgadmin/docker-compose.yaml)
+
+### 6. [Apache Spark + JupyterLab](./spark-jupyter/README.md)
+Local Apache Spark 3.5.0 cluster (1 master + 2 workers) with a JupyterLab interface.
