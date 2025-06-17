@@ -4,10 +4,12 @@ services:
     container_name: spark-master
     hostname: spark-master
     ports:
-      - "8080:8080"
-      - "7077:7077"
+      - "8080:8080"  # Spark Master UI
+      - "7077:7077"  # Spark Master TCP
     environment:
       - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_LOCAL_IP=spark-master
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
@@ -35,7 +37,6 @@ services:
     volumes:
       - ./data:/data
 
-
   spark-worker-2:
     image: bitnami/spark:3.5.0
     container_name: spark-worker-2
@@ -59,17 +60,20 @@ services:
   jupyter:
     image: jupyter/pyspark-notebook:spark-3.5.0
     container_name: jupyter-lab
-    environment:
-      - PYSPARK_PYTHON=python3
-      - PYSPARK_DRIVER_PYTHON=python3
-    command: >
-      start-notebook.sh --NotebookApp.token='password'
     depends_on:
       - spark-master
       - spark-worker-1
       - spark-worker-2
     ports:
-      - "8888:8888"
+      - "8888:8888"  # JupyterLab
+      - "4040:4040"  # Spark Application UI
+    environment:
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
+      - SPARK_DRIVER_HOST=host.docker.internal  # macOS/Windows
+      - SPARK_DRIVER_PORT=4040
+    command: >
+      start-notebook.sh --NotebookApp.token='password'
     volumes:
       - ./notebooks:/home/jovyan/work
       - ./data:/data
