@@ -16,7 +16,27 @@ Clickhouse
 ### 4. [PostgreSQL](./postgres/README.md)
 Postgres SQL server 
 
-### 5. [PostgreSQL + pgAdmin4](./postgres-pgadmin/docker-compose.yaml)
+### 5. [PostgreSQL + pgAdmin4](./postgres-pgadmin/README.md)
 
 ### 6. [Apache Spark + JupyterLab](./spark-jupyter/README.md)
 Local Apache Spark 3.5.0 cluster (1 master + 2 workers) with a JupyterLab interface.
+
+### 7. [Apache Superset](./superset/README.md)
+The repository is taken from [https://github.com/apache/superset](https://github.com/apache/superset)
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/apache/superset.git
+    cd superset
+    ```
+
+2. **Start Superset Using Docker Compose**
+The first startup may take 5–10 minutes:
+    ```bash
+    docker-compose -f docker-compose-non-dev.yml up
+    ```
+
+3 **Access the Superset Web UI**
+- **URL:** [http://localhost:8088/](http://localhost:8088/)
+- **Username:** `admin`
+- **Password:** `admin`
