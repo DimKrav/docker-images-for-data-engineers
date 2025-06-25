@@ -40,3 +40,8 @@ The first startup may take 5–10 minutes:
 - **URL:** [http://localhost:8088/](http://localhost:8088/)
 - **Username:** `admin`
 - **Password:** `admin`
+
+### 8. [Apache Airflow - DWH- Apache Superset](./airflow-postgres-superset/README.md)
+The repository is a combination of
+1. [Airflow + PostgreSQL](./airflow-postgres/README.md)
+7. [Apache Superset](./superset/README.md)
