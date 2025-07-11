@@ -2,7 +2,8 @@
 .env
 *.csv
 
+
 postgres_data/
 data/
 notebooks/
-
+sql/
