@@ -1,0 +1,29 @@
+services:
+  keeper:
+    image: clickhouse/clickhouse-keeper
+    container_name: keeper
+    ports:
+      - "9181:9181"
+    restart: unless-stopped
+
+  clickhouse-01:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouse-01
+    ports:
+      - "8123:8123" 
+    restart: unless-stopped
+    depends_on:
+      - keeper
+    volumes:
+      - ./clickhouse-01/macros.xml:/etc/clickhouse-server/config.d/macros.xml
+
+  clickhouse-02:
+    image: clickhouse/clickhouse-server
+    container_name: clickhouse-02
+    ports:
+      - "8124:8123"
+    restart: unless-stopped
+    depends_on:
+      - keeper
+    volumes:
+      - ./clickhouse-02/macros.xml:/etc/clickhouse-server/config.d/macros.xml
