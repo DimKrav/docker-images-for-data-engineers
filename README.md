@@ -17,15 +17,15 @@ Clickhouse on a single node
 Clickhouse cluster with clickhouse keeper.
 2 shards and 2 replicas
 
-### 4. [PostgreSQL](./postgres/README.md)
+### 5. [PostgreSQL](./postgres/README.md)
 Postgres SQL server 
 
-### 5. [PostgreSQL + pgAdmin4](./postgres-pgadmin/README.md)
+### 6. [PostgreSQL + pgAdmin4](./postgres-pgadmin/README.md)
 
-### 6. [Apache Spark + JupyterLab](./spark-jupyter/README.md)
+### 7. [Apache Spark + JupyterLab](./spark-jupyter/README.md)
 Local Apache Spark 3.5.0 cluster (1 master + 2 workers) with a JupyterLab interface.
 
-### 7. [Apache Superset](./superset/README.md)
+### 8. [Apache Superset](./superset/README.md)
 The repository is taken from [https://github.com/apache/superset](https://github.com/apache/superset)
 
 1.  **Clone the Repository**
@@ -45,7 +45,7 @@ The first startup may take 5–10 minutes:
 - **Username:** `admin`
 - **Password:** `admin`
 
-### 8. [Apache Airflow - DWH- Apache Superset](./airflow-postgres-superset/README.md)
+### 9. [Apache Airflow - DWH- Apache Superset](./airflow-postgres-superset/README.md)
 The repository is a combination of
 1. [Airflow + PostgreSQL](./airflow-postgres/README.md)
 7. [Apache Superset](./superset/README.md)
