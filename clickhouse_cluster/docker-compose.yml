@@ -1,29 +1,91 @@
 services:
-  keeper:
-    image: clickhouse/clickhouse-keeper
-    container_name: keeper
-    ports:
-      - "9181:9181"
-    restart: unless-stopped
-
-  clickhouse-01:
-    image: clickhouse/clickhouse-server
-    container_name: clickhouse-01
-    ports:
-      - "8123:8123" 
-    restart: unless-stopped
-    depends_on:
-      - keeper
+  clickhouse-keeper-01: &keeper-base
+    image: "clickhouse/clickhouse-keeper:${CHKVER:-latest-alpine}"
+      # user: "101:101"
+    container_name: clickhouse-keeper-01
+    hostname: clickhouse-keeper-01
+    environment:
+      KEEPER_ID: 1
     volumes:
-      - ./clickhouse-01/macros.xml:/etc/clickhouse-server/config.d/macros.xml
+      - type: bind
+        source: ./config/keeper/keeper_config.xml
+        target: /etc/clickhouse-keeper/keeper_config.xml
+    networks:
+      - clickhouse-network
+  clickhouse-keeper-02:
+    <<: *keeper-base
+    container_name: clickhouse-keeper-02
+    hostname: clickhouse-keeper-02
+    environment:
+      KEEPER_ID: 2
+  clickhouse-keeper-03:
+    <<: *keeper-base
+    container_name: clickhouse-keeper-03
+    hostname: clickhouse-keeper-03
+    environment:
+      KEEPER_ID: 3
 
-  clickhouse-02:
-    image: clickhouse/clickhouse-server
-    container_name: clickhouse-02
-    ports:
-      - "8124:8123"
-    restart: unless-stopped
-    depends_on:
-      - keeper
+  clickhouse-01-01: &clickhouse-base
+    image: "clickhouse/clickhouse-server:${CHVER:-latest}"
+      # user: "101:101"
+    container_name: clickhouse-01-01
+    hostname: clickhouse-01-01
+    environment:
+      CH_SHARD: 01
     volumes:
-      - ./clickhouse-02/macros.xml:/etc/clickhouse-server/config.d/macros.xml
+      - type: bind
+        source: ./config/clickhouse/config.d/
+        target: /etc/clickhouse-server/config.d/
+      - type: bind
+        source: ./config/clickhouse/config.d/
+        target: /etc/clickhouse-server/users.d/
+    networks:
+      - clickhouse-network
+    ports:
+      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:9000:9000"
+    depends_on:
+      - clickhouse-keeper-01
+      - clickhouse-keeper-02
+      - clickhouse-keeper-03
+    healthcheck:
+      test: wget \
+          --no-verbose \
+          --tries=1 \
+          --spider \
+          localhost:8123/replicas_status || exit 1
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 3s
+  clickhouse-01-02:
+    <<: *clickhouse-base
+    container_name: clickhouse-01-02
+    hostname: clickhouse-01-02
+    ports:
+      - "127.0.0.1:8124:8124"
+      - "127.0.0.1:9001:9001"
+    environment:
+      CH_SHARD: 01
+  clickhouse-02-01:
+    <<: *clickhouse-base
+    container_name: clickhouse-02-01
+    hostname: clickhouse-02-01
+    ports:
+      - "127.0.0.1:8133:8125"
+      - "127.0.0.1:9011:9002"
+    environment:
+      CH_SHARD: 02
+  clickhouse-02-02:
+    <<: *clickhouse-base
+    container_name: clickhouse-02-02
+    hostname: clickhouse-02-02
+    ports:
+      - "127.0.0.1:8134:8125"
+      - "127.0.0.1:9012:9000"
+    environment:
+      CH_SHARD: 02
+
+networks:
+  clickhouse-network:
+    name: clickhouse-compose-network

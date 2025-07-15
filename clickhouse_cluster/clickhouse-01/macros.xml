@@ -1,5 +1,0 @@
-<clickhouse>
-    <macros>
-        <replica>clickhouse-01</replica>
-    </macros>
-</clickhouse>
