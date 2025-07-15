@@ -10,8 +10,12 @@ A pre-configured environment for Apache Airflow (Local Executor) with PostgreSQL
 ### 2. [Hadoop on Local Machine](./docker-hadoop/README.md) 
 This docker-compose file is taken from the repository [big-data-europe/docker-hadoop](https://github.com/big-data-europe/docker-hadoop)
 
-### 3. [Clickhouse](./clickhouse/README.md)
-Clickhouse
+### 3. [Clickhouse](./clickhouse_single/README.md)
+Clickhouse on a single node
+
+### 4. [Clickhouse cluster](./clickhouse_cluster/README.md)
+Clickhouse cluster with clickhouse keeper.
+2 shards and 2 replicas
 
 ### 4. [PostgreSQL](./postgres/README.md)
 Postgres SQL server 
