@@ -7,3 +7,4 @@ postgres_data/
 data/
 notebooks/
 sql/
+logs/
