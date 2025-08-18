@@ -5,23 +5,38 @@
 To start the cluster, run the following command:
 
 ```bash
-make up
+make config up
 ```
 
-This will start the ClickHouse server and keeper containers.
-The containers will be named `clickhouse-<shard-id>-<replica-id>` and `clickhouse-keeper-<id>`.
+This will start the ClickHouse server and zookeeper container named `company_cluster`.
 
 ### Access ClickHouse Client
 
-To access the ClickHouse client, you can run the following command:
+The ClickHouse cluster is in `172.23.0.0/24` network.
+
+| **Container** | **Address** |
+|---------------|-------------|
+| zookeeper     | 172.23.0.10 |
+| clickhouse01  | 172.23.0.11 |
+| clickhouse02  | 172.23.0.12 |
+| clickhouse03  | 172.23.0.13 |
+| clickhouse04  | 172.23.0.14 |
+
+
+### Users
+- default - no password
+- admin - password 123
+
+### Stop and Start the Cluster
+
+To stop the cluster, run the following command:
 
 ```bash
-make client0101
+make start
+make stop
 ```
 
-This will open a bash terminal in the container for the first ClickHouse server (`clickhouse-01-01`), allowing you to execute SQL queries against the cluster.
-
-### Stop the Cluster
+### Down the Cluster
 
 To stop the cluster, run the following command:
 
