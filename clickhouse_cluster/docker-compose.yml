@@ -1,91 +1,62 @@
 services:
-  clickhouse-keeper-01: &keeper-base
-    image: "clickhouse/clickhouse-keeper:${CHKVER:-latest-alpine}"
-      # user: "101:101"
-    container_name: clickhouse-keeper-01
-    hostname: clickhouse-keeper-01
-    environment:
-      KEEPER_ID: 1
-    volumes:
-      - type: bind
-        source: ./config/keeper/keeper_config.xml
-        target: /etc/clickhouse-keeper/keeper_config.xml
+  zookeeper:
+    image: zookeeper:3.7
+    container_name: zookeeper
+    hostname: zookeeper
     networks:
-      - clickhouse-network
-  clickhouse-keeper-02:
-    <<: *keeper-base
-    container_name: clickhouse-keeper-02
-    hostname: clickhouse-keeper-02
-    environment:
-      KEEPER_ID: 2
-  clickhouse-keeper-03:
-    <<: *keeper-base
-    container_name: clickhouse-keeper-03
-    hostname: clickhouse-keeper-03
-    environment:
-      KEEPER_ID: 3
-
-  clickhouse-01-01: &clickhouse-base
-    image: "clickhouse/clickhouse-server:${CHVER:-latest}"
-      # user: "101:101"
-    container_name: clickhouse-01-01
-    hostname: clickhouse-01-01
-    environment:
-      CH_SHARD: 01
-    volumes:
-      - type: bind
-        source: ./config/clickhouse/config.d/
-        target: /etc/clickhouse-server/config.d/
-      - type: bind
-        source: ./config/clickhouse/config.d/
-        target: /etc/clickhouse-server/users.d/
+      clickhouse-network:
+        ipv4_address: 172.23.0.10
+  clickhouse01:
+    image: clickhouse/clickhouse-server:22.5
+    container_name: clickhouse01
+    hostname: clickhouse01
     networks:
-      - clickhouse-network
+      clickhouse-network:
+        ipv4_address: 172.23.0.11
     ports:
       - "127.0.0.1:8123:8123"
       - "127.0.0.1:9000:9000"
+    volumes:
+      - ${PWD}/clickhouse01:/etc/clickhouse-server
     depends_on:
-      - clickhouse-keeper-01
-      - clickhouse-keeper-02
-      - clickhouse-keeper-03
-    healthcheck:
-      test: wget \
-          --no-verbose \
-          --tries=1 \
-          --spider \
-          localhost:8123/replicas_status || exit 1
-      interval: 40s
-      timeout: 30s
-      retries: 3
-      start_period: 3s
-  clickhouse-01-02:
-    <<: *clickhouse-base
-    container_name: clickhouse-01-02
-    hostname: clickhouse-01-02
-    ports:
-      - "127.0.0.1:8124:8124"
-      - "127.0.0.1:9001:9001"
-    environment:
-      CH_SHARD: 01
-  clickhouse-02-01:
-    <<: *clickhouse-base
-    container_name: clickhouse-02-01
-    hostname: clickhouse-02-01
-    ports:
-      - "127.0.0.1:8133:8125"
-      - "127.0.0.1:9011:9002"
-    environment:
-      CH_SHARD: 02
-  clickhouse-02-02:
-    <<: *clickhouse-base
-    container_name: clickhouse-02-02
-    hostname: clickhouse-02-02
-    ports:
-      - "127.0.0.1:8134:8125"
-      - "127.0.0.1:9012:9000"
-    environment:
-      CH_SHARD: 02
+      - zookeeper
+  clickhouse02:
+    image: clickhouse/clickhouse-server:22.5
+    container_name: clickhouse02
+    hostname: clickhouse02
+    networks:
+      clickhouse-network:
+        ipv4_address: 172.23.0.12
+    volumes:
+      - ${PWD}/clickhouse02:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
+  clickhouse03:
+    image: clickhouse/clickhouse-server:22.5
+    container_name: clickhouse03
+    hostname: clickhouse03
+    networks:
+      clickhouse-network:
+        ipv4_address: 172.23.0.13
+    volumes:
+      - ${PWD}/clickhouse03:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
+  clickhouse04:
+    image: clickhouse/clickhouse-server:22.5
+    container_name: clickhouse04
+    hostname: clickhouse04
+    networks:
+      clickhouse-network:
+        ipv4_address: 172.23.0.14
+    volumes:
+      - ${PWD}/clickhouse04:/etc/clickhouse-server
+    depends_on:
+      - zookeeper
 
 networks:
   clickhouse-network:
-    name: clickhouse-compose-network
+    name: clickhouse-network
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
