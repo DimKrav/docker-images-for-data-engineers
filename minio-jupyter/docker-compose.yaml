@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # Эмуляция S3
+  minio:
+    image: minio/minio:latest
+    container_name: local-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # API port
+      - "9001:9001" # Web UI port
+    environment:
+      MINIO_ROOT_USER: "admin"
+      MINIO_ROOT_PASSWORD: "password"
+    volumes:
+      - ./minio_data:/data
+
+  # Для запуска скриптов (опционально, можно запускать и локально, если есть venv)
+  jupyter:
+    image: jupyter/scipy-notebook:python-3.10
+    container_name: data-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    environment:
+      - JUPYTER_TOKEN=easytoken

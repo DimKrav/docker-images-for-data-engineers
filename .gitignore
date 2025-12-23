@@ -5,6 +5,8 @@
 
 postgres_data/
 data/
+minio_data/
 notebooks/
 sql/
 logs/
+dags/
