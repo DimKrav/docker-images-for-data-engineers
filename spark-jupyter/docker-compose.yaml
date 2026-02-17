@@ -1,79 +1,43 @@
 services:
   spark-master:
-    image: bitnami/spark:3.5.0
+    image: jupyter/pyspark-notebook:latest
     container_name: spark-master
-    hostname: spark-master
-    ports:
-      - "8080:8080"  # Spark Master UI
-      - "7077:7077"  # Spark Master TCP
+    user: root
     environment:
       - SPARK_MODE=master
-      - SPARK_MASTER_HOST=spark-master
-      - SPARK_LOCAL_IP=spark-master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./data:/data
-
-  spark-worker-1:
-    image: bitnami/spark:3.5.0
-    container_name: spark-worker-1
-    hostname: spark-worker-1
-    depends_on:
-      - spark-master
     ports:
-      - "8081:8081"
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=2G
-      - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./data:/data
-
-  spark-worker-2:
-    image: bitnami/spark:3.5.0
-    container_name: spark-worker-2
-    hostname: spark-worker-2
-    depends_on:
-      - spark-master
-    ports:
-      - "8082:8081"
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=2G
-      - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./data:/data
-
-  jupyter:
-    image: jupyter/pyspark-notebook:spark-3.5.0
-    container_name: jupyter-lab
-    depends_on:
-      - spark-master
-      - spark-worker-1
-      - spark-worker-2
-    ports:
-      - "8888:8888"  # JupyterLab
-      - "4040:4040"  # Spark Application UI
-    environment:
-      - PYSPARK_PYTHON=python3
-      - PYSPARK_DRIVER_PYTHON=python3
-      - SPARK_DRIVER_HOST=host.docker.internal  # macOS/Windows
-      - SPARK_DRIVER_PORT=4040
-    command: >
-      start-notebook.sh --NotebookApp.token='password'
+      - "8080:8080"
+      - "7077:7077"
     volumes:
       - ./notebooks:/home/jovyan/work
-      - ./data:/data
+    command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master
+
+  spark-worker:
+    image: jupyter/pyspark-notebook:latest
+    container_name: spark-worker
+    user: root
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2g
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    command: /usr/local/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+
+  jupyter:
+    image: jupyter/pyspark-notebook:latest
+    container_name: jupyter-spark
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=password
+    depends_on:
+      - spark-master
